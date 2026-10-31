@@ -1,0 +1,10 @@
+{
+  "description": "A tab where a person works through a list of manual checks an agent wrote, and the agent gets the result back to fix what failed.",
+  "topics": [
+    "hangar-kit",
+    "hangar",
+    "claude-code",
+    "testing",
+    "review"
+  ]
+}
