@@ -5,20 +5,17 @@
 //! was seen) or Skip; the answers are kept in the kit's data folder; the result
 //! goes back to the agent that opened the tab, who fixes what failed.
 //!
-//! This is the page of `tabs/checklist/` again, with the same behaviour, the
-//! same host calls and the same five permissions:
+//! The tab asks for five permissions:
 //!
-//! - `logic.rs` is `logic.js`: the list checked, the answers kept, the summary.
-//! - this file is `controller.js`: loading, saving within `data.write`'s rate,
-//!   the title and the badge, sending.
-//! - `view.rs` is `view.js`: the state, drawn.
-//! - `strings.rs` is the page's `STRINGS`, in English and French.
+//! - `logic.rs`: the list checked, the answers kept, the summary.
+//! - this file: loading, saving within `data.write`'s rate, the title and the
+//!   badge, sending.
+//! - `view.rs`: the state, drawn.
+//! - `strings.rs`: the words, in English and French.
 //!
-//! What a native tab cannot do that the page did: the page wrote its last
-//! answers when it was closed (`pagehide`); a closing tab here gets no last
-//! update, so the answers are written as they come, after a pause of 1.5 s, and
-//! a tab that goes behind another writes at once. What is closed within the
-//! pause is lost.
+//! A closing tab gets no last update, so the answers are written as they come,
+//! after a pause of 1.5 s, and a tab that goes behind another writes at once.
+//! What is closed within the pause is lost.
 
 use std::time::Duration;
 

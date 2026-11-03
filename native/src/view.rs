@@ -1,4 +1,4 @@
-//! The state, drawn: `view.js` again. Nothing the list or an answer says is
+//! The state, drawn. Nothing the list or an answer says is
 //! more than text; every string comes from `strings.rs`.
 
 use hangar_kit_sdk::Handler;

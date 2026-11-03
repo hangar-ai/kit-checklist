@@ -1,10 +1,9 @@
 //! What is neither the behaviour nor the drawing: the params read like form
 //! input, the list file checked, the answers kept, the badge and the summary
-//! an agent receives. Pure: no SDK type, no clock, no call. `logic.js`, ported.
+//! an agent receives. Pure: no SDK type, no clock, no call.
 //!
-//! The answers' file and the steps' keys are the HTML tab's, to the byte: a
-//! person who opens the same list in Hangar 1.x and in the native Hangar finds
-//! the same answers. So text is measured the way JavaScript measures it, in
+//! The answers' file and the steps' keys are those the kit's earlier HTML tab
+//! wrote, to the byte: a person who had answers kept by it finds them again. So text is measured the way JavaScript measures it, in
 //! UTF-16 code units, and trimmed the way `String.prototype.trim` trims.
 
 use std::collections::{BTreeMap, HashMap};

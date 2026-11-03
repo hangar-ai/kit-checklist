@@ -1,6 +1,6 @@
-//! Shared by the tests: a pretend Hangar (`test/helpers.js`'s `fakeHangar`)
-//! that answers the tab's calls over files and a data folder held in memory,
-//! and a clock whose timers only fire when the test says so (`fakeClock`).
+//! Shared by the tests: a pretend Hangar that answers the tab's
+//! calls over files and a data folder held in memory, and a clock whose timers
+//! only fire when the test says so.
 //! No test touches a real file.
 #![allow(dead_code)]
 

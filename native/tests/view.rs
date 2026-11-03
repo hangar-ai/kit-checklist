@@ -1,4 +1,4 @@
-//! `test/view.test.js`, case for case: what the page draws, from the view the
+//! What the tab draws, from the view the
 //! tab hands Hangar (widgets, not a DOM), both languages, every state
 //! designed, and the presses that reach the behaviour. Nothing a list or an
 //! answer says is more than text, here by construction: a widget holds a

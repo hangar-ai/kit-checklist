@@ -1,6 +1,6 @@
-//! `test/logic.test.js`, case for case: the pure part of the tab. The values
-//! the HTML tab wrote (the keys, the answers' file, the summary) are those its
-//! `logic.js` computes, so a person's answers survive the change of tab.
+//! The pure part of the tab. The values the kit's earlier HTML tab wrote (the
+//! keys, the answers' file, the summary) are held to the byte, so a person's
+//! answers survive the change of tab.
 
 mod common;
 
@@ -174,7 +174,7 @@ fn a_steps_key_follows_its_text_not_its_place() {
 
 #[test]
 fn the_keys_and_paths_are_the_html_tabs_to_the_byte() {
-    // Computed by tabs/checklist/logic.js: answers written there are read here.
+    // Computed by the kit's earlier HTML tab: answers written there are read here.
     assert_eq!(logic::fnv("a"), "e40c292c");
     assert_eq!(logic::fnv(""), "811c9dc5");
     assert_eq!(logic::fnv("é😀 ok"), "a3f6608d", "over UTF-16 code units");
@@ -414,7 +414,7 @@ fn the_list() -> logic::List {
 #[test]
 fn the_summary_is_plain_says_what_failed_with_the_notes_then_what_was_skipped() {
     let text = logic::build_summary(&the_list(), &keys(), &scenario_saved(), LIST_PATH);
-    // Exactly what tabs/checklist/logic.js builds for the same answers.
+    // Exactly what the kit's earlier HTML tab built for the same answers.
     assert_eq!(
         text,
         "Checklist results: \"Login and logout\" (recette/login.json).\n\

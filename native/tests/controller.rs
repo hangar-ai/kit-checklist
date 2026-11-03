@@ -1,8 +1,8 @@
-//! `test/controller.test.js`, case for case: the tab's behaviour against a
-//! pretend Hangar: reading the list, keeping answers within data.write's rate,
-//! the badge, sending, and reopening to test a fix. The page's fake timers are
-//! `Sim::advance`; its `flush()` for a page that is leaving is the tab going
-//! behind another, the one thing a native tab hears before it is put away.
+//! The tab's behaviour against a pretend Hangar: reading the list, keeping
+//! answers within data.write's rate, the badge, sending, and reopening to test
+//! a fix. Time is `Sim::advance`; the last write before a tab goes away is the
+//! tab going behind another, the one thing a native tab hears before it is
+//! put away.
 
 mod common;
 
@@ -610,7 +610,7 @@ fn the_title_and_the_badge_are_only_sent_when_they_change() {
 
 #[test]
 fn the_answers_of_the_html_tab_are_read_here() {
-    // A file written by tabs/checklist/controller.js, as Hangar 1.x kept it.
+    // A file as the kit's earlier HTML tab kept it.
     let keys = keys();
     let html_tab_wrote = format!(
         "{{\n \"v\": 1,\n \"answers\": {{\n  \"{}\": {{\n   \"status\": \"ok\"\n  }},\n  \"{}\": {{\n   \"status\": \"fail\",\n   \"note\": \"blank\"\n  }}\n }},\n \"redo\": {{}},\n \"sentAt\": null\n}}",
