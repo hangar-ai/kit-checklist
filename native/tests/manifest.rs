@@ -1,6 +1,5 @@
-//! `test/manifest.test.js` for what the native tab adds: the manifest's
-//! `native` field, the module it names, and the calls the tab makes held to
-//! the permissions it declares. The page's own cases stay in the Node tests.
+//! The manifest of a native tab: the module its `entry` names, and the calls
+//! the tab makes held to the permissions it declares.
 
 mod common;
 
@@ -26,25 +25,24 @@ fn tab() -> Value {
 }
 
 #[test]
-fn the_manifest_keeps_the_page_and_adds_the_module() {
+fn the_manifest_is_schema_2_and_the_entry_is_the_module() {
     let manifest = manifest();
-    // Hangar 1.x reads schema 1 and ignores `native`: it opens the page.
-    assert_eq!(manifest["schema"], 1);
-    assert_eq!(manifest["hangar"], ">=1.9.0");
+    assert_eq!(manifest["schema"], 2, "a native tab needs schema 2");
+    assert_eq!(manifest["hangar"], ">=2.0.0");
     assert_eq!(manifest["id"], "checklist");
     let tab = tab();
     assert_eq!(tab["id"], "checklist");
-    assert_eq!(tab["entry"], "tabs/checklist/index.html");
+    assert_eq!(tab["entry"], "tabs/checklist.wasm");
+    assert!(tab.get("native").is_none(), "no `native` field in schema 2");
     assert!(
-        kit().join("tabs/checklist/index.html").is_file(),
-        "the page is still there"
+        !kit().join("tabs/checklist").exists(),
+        "no page beside the module"
     );
-    assert_eq!(tab["native"], "tabs/checklist.wasm");
 }
 
 #[test]
 fn the_native_module_exists_is_a_wasm_file_and_is_inside_the_kit() {
-    let native = tab()["native"].as_str().expect("a name").to_owned();
+    let native = tab()["entry"].as_str().expect("a name").to_owned();
     assert!(native.ends_with(".wasm"));
     assert!(!native.starts_with('/') && !native.contains('\\') && !native.contains(':'));
     assert!(
@@ -157,8 +155,8 @@ fn every_call_the_tab_makes_is_one_its_permissions_allow() {
             "{permission} is declared and never used; calls: {seen:?}"
         );
     }
-    // The page's calls, bar `tab.params` (the start carries them), and the two
-    // a native tab has for `hangar.ui`.
+    // The calls the tab makes of Hangar, and the two of `hangar.ui` that need
+    // no permission.
     let page = [
         "files.read",
         "data.read",

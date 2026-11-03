@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "id": "checklist",
   "name": "Checklist",
   "version": "0.1.0",
@@ -7,7 +7,7 @@
   "author": "Hangar",
   "homepage": "https://github.com/hangar-ai/kit-checklist",
   "icon": "icon.svg",
-  "hangar": ">=1.9.0",
+  "hangar": ">=2.0.0",
   "gallery": {
     "permissionsSummary": "Reads the checklist file an agent wrote in the workspace, keeps your answers in the kit's own data folder, and sends the agent that asked a plain summary of the results. Changes no project file.",
     "tags": ["testing", "review", "tab"]
@@ -16,8 +16,7 @@
     {
       "id": "checklist",
       "title": "Checklist",
-      "entry": "tabs/checklist/index.html",
-      "native": "tabs/checklist.wasm",
+      "entry": "tabs/checklist.wasm",
       "icon": "icon.svg",
       "permissions": ["files.read", "data.read", "data.write", "panes.send", "notify"],
       "params": {
