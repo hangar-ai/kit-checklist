@@ -57,6 +57,20 @@ test("the tab: five permissions and nothing more, one tab per list", () => {
   assert.doesNotMatch(param.pattern, /\(\?[<!=]/, "Rust's regex has no look-around");
 });
 
+test("the native tab: a module beside the page, inside the kit", () => {
+  const tab = manifest.tabs[0];
+  // Hangar 1.x ignores `native` and opens the page; the native Hangar opens the module.
+  assert.equal(manifest.schema, 1);
+  assert.equal(tab.native, "tabs/checklist.wasm");
+  assert.ok(tab.native.endsWith(".wasm") && exists(tab.native), "the module is built and committed");
+  assert.ok(!path.isAbsolute(tab.native) && !tab.native.includes("\\") && !tab.native.includes(":"));
+  assert.ok(tab.native.split("/").every((part) => part && !part.startsWith(".")), "inside the kit, not hidden");
+  const bytes = fs.readFileSync(path.join(KIT, tab.native));
+  assert.deepEqual([...bytes.subarray(0, 4)], [0, 0x61, 0x73, 0x6d], "WebAssembly");
+  assert.ok(bytes.length < 64 * 1024 * 1024, "64 MB at most");
+  assert.ok(exists("scripts/build-native.sh") && exists("native/Cargo.toml") && exists("native/Cargo.lock"));
+});
+
 test("the page loads only the kit's own files and Hangar UI's three addresses", () => {
   const html = fs.readFileSync(path.join(TAB, "index.html"), "utf8");
   const sources = [...html.matchAll(/(?:src|href)="([^"]+)"/g)].map((match) => match[1]);
@@ -90,9 +104,14 @@ test("the skill is there, named like the kit, and asks for concrete steps", () =
 
 test("nothing personal, nothing attributed to an assistant", () => {
   const files = [];
-  const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).forEach((entry) => (entry.isDirectory() ? walk(path.join(dir, entry.name)) : files.push(path.join(dir, entry.name))));
+  const skipped = new Set([".git", "node_modules", ".hangar-ui", "target"]); // not the kit's own text
+  const walk = (dir) =>
+    fs.readdirSync(dir, { withFileTypes: true }).forEach((entry) => {
+      if (entry.isDirectory()) return skipped.has(entry.name) ? undefined : walk(path.join(dir, entry.name));
+      files.push(path.join(dir, entry.name));
+    });
   walk(KIT);
-  for (const file of files.filter((file) => path.basename(file) !== "manifest.test.js")) {
+  for (const file of files.filter((file) => path.basename(file) !== "manifest.test.js" && !file.endsWith(".wasm"))) {
     const text = fs.readFileSync(file, "utf8");
     assert.doesNotMatch(text, /C:\\Users|\/Users\/|@[a-z0-9-]+\.(fr|com)\b|Co-Authored-By/i, path.relative(KIT, file));
   }

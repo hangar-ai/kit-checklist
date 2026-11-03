@@ -17,6 +17,7 @@
       "id": "checklist",
       "title": "Checklist",
       "entry": "tabs/checklist/index.html",
+      "native": "tabs/checklist.wasm",
       "icon": "icon.svg",
       "permissions": ["files.read", "data.read", "data.write", "panes.send", "notify"],
       "params": {
