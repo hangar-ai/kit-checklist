@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, rust-rewrite]
     tags: ["v*"]
   pull_request:
 
@@ -11,9 +11,9 @@ permissions:
 
 jobs:
   kit-check:
-    uses: hangar-ai/.github/.github/workflows/kit-check.yml@v1
+    uses: hangar-ai/.github/.github/workflows/kit-check.yml@rust-rewrite
 
-  # The native tab: its tests, and the module Hangar runs. Hangar never builds
+  # The tab is native: its tests, and the module Hangar runs. Hangar never builds
   # a kit, so tabs/checklist.wasm is committed, and this job fails when it is
   # not what native/ builds (scripts/build-native.sh, with the compiler that
   # native/rust-toolchain.toml pins, gives the same bytes anywhere).
@@ -27,11 +27,5 @@ jobs:
       - name: Tests of the native tab
         working-directory: native
         run: cargo test --locked
-      - name: Build the module
-        run: scripts/build-native.sh
       - name: The committed module is this build
-        run: |
-          if ! git diff --quiet -- tabs/checklist.wasm; then
-            echo "::error file=tabs/checklist.wasm::tabs/checklist.wasm is not what native/ builds. Run scripts/build-native.sh and commit the result with the source."
-            exit 1
-          fi
+        run: scripts/build-native.sh --check

@@ -38,28 +38,21 @@ back to the agent, who fixes what failed.
   arrives; write concrete steps with what to expect, never « check it works ».
 
 English and French, from Hangar's language; light and dark with Hangar's own theme;
-readable at the side panel's narrowest. It uses Hangar UI and loads nothing else.
+readable at the side panel's narrowest.
 
-### Two tabs of one behaviour
+### A native tab
 
-The tab exists twice, and the manifest names both:
+The tab is native (Hangar 2.0 or later): Rust compiled to WebAssembly, in `native/`, built into
+`tabs/checklist.wasm`, which the manifest names as the tab's `entry`. No browser engine runs for
+it: Hangar draws its widgets itself. It keeps its answers in the kit's data folder, one small
+file per list, and asks for five permissions. A person who kept answers with the kit's earlier
+HTML tab finds them again: the file and the steps' keys are the same to the byte.
 
-- **The page** (`tabs/checklist/`, HTML) is what Hangar 1.x opens.
-- **The native tab** (`native/`, Rust compiled to WebAssembly, `tabs/checklist.wasm`) is what
-  the native Hangar opens. No browser engine runs for it: Hangar draws its widgets itself.
-  It reads the same lists, keeps its answers in the same files (an answer given in one is
-  found by the other), sends the same summary and asks for the same five permissions. It
-  calls the same methods, bar `tab.params` (the start carries the params) and the clipboard
-  and toast that the page had in its own document (`ui.copy`, `ui.toast`; they need no
-  permission). When the module cannot be loaded, the native Hangar opens the page and says
-  so in the tab's bar.
+What a native tab cannot do:
 
-What the native tab cannot do that the page did:
-
-- **A last write when the tab is closed.** A closing tab gets no last update (the page wrote
-  on `pagehide`). Answers are written as they come, after the pause below, and when the tab
-  goes behind another; the answers of the last seconds before a tab is closed are lost (1.5 s
-  of them, up to 7 s just after a write).
+- **A last write when the tab is closed.** A closing tab gets no last update. Answers are written
+  as they come, after the pause below, and when the tab goes behind another; the answers of the
+  last seconds before a tab is closed are lost (1.5 s of them, up to 7 s just after a write).
 - **Select text with the pointer** (a step, an expectation): Hangar's text cannot be selected.
   The summary has its copy button for a list nobody asked for.
 - **Accessibility roles** (`role="alert"`, `aria-*`): Hangar's widgets have no accessibility
@@ -82,8 +75,7 @@ The summary holds the steps' text and your notes, and goes to that agent only.
 
 ## Install
 
-You need Hangar 1.9.0 or later. Any Hangar opens the tab: the native one runs
-`tabs/checklist.wasm`, an older one the page.
+You need Hangar 2.0.0 or later, which runs native tabs.
 
 1. In Hangar, Settings › Kits, add the GitHub link:
    `https://github.com/hangar-ai/kit-checklist`
@@ -95,27 +87,20 @@ You need Hangar 1.9.0 or later. Any Hangar opens the tab: the native one runs
 
 ```
 checklist/
-├── hangar-kit.json            the kit: id, hangar >=1.9.0, the tab (`entry` the page, `native` the module), its `path` param, five permissions
+├── hangar-kit.json            the kit: schema 2, id, hangar >=2.0.0, the tab (`entry` is the module), its `path` param, five permissions
 ├── icon.svg
 ├── .claude-plugin/plugin.json the Claude Code plugin (name = the kit's id), only a skill
 ├── skills/checklist/SKILL.md
-├── tabs/checklist/            the page, for Hangar 1.x
-│   ├── index.html             Hangar UI (/_hangar/kit.css, kit.js, kit-ui.js), then the scripts below
-│   ├── logic.js               pure: the list checked, answers read and kept, badge, summary; messages in en and fr
-│   ├── controller.js          reads the list, saves within data.write's rate, sets badge and title, sends
-│   ├── view.js                draws a state with createElement + textContent, never markup
-│   ├── app.js                 wires them in the page, in Hangar's language
-│   └── style.css              layout of a step only: every colour is Hangar UI's
-├── tabs/checklist.wasm        the native tab, built from native/ and committed: Hangar runs it, it never builds
-├── native/                    the native tab, a Rust crate on hangar-kit-sdk (cdylib + rlib)
+├── tabs/checklist.wasm        the tab, built from native/ and committed: Hangar runs it, it never builds
+├── native/                    the tab, a Rust crate on hangar-kit-sdk (cdylib + rlib)
 │   ├── Cargo.toml, Cargo.lock, rust-toolchain.toml
-│   ├── src/lib.rs             the tab: state, messages, loading, saving, sending (controller.js)
-│   ├── src/logic.rs           pure, no SDK type: the list, the answers, the summary (logic.js)
-│   ├── src/view.rs            the state as widgets (view.js)
-│   ├── src/strings.rs         the words, en and fr (logic.js's STRINGS)
-│   └── tests/                 cargo test, through the SDK's harness: the cases of test/, ported
-├── scripts/build-native.sh    native/ -> tabs/checklist.wasm (wasm32-unknown-unknown, release)
-├── test/                      node --test, no dependency, against a fake window.hangar
+│   ├── src/lib.rs             the tab: state, messages, loading, saving, sending
+│   ├── src/logic.rs           pure, no SDK type: the list, the answers, the summary
+│   ├── src/view.rs            the state as widgets
+│   ├── src/strings.rs         the words, en and fr
+│   └── tests/                 cargo test, through the SDK's harness
+├── scripts/build-native.sh    native/ -> tabs/checklist.wasm (wasm32-unknown-unknown, release); --check
+├── test/manifest.test.js      node --test: the manifest, the plugin and the skill
 └── package.json, run-tests.js let `node --test kits/checklist/` find the tests on any Node
 ```
 
@@ -127,8 +112,7 @@ Choices worth knowing:
   share one.
 - **Writes are spread out.** `data.write` is limited to 10 a minute, so answers and notes
   are written after a short pause (1.5 s after the first change, not pushed back by the next
-  ones) and never closer than 7 seconds, and once more when the tab is hidden (the page also
-  when it is closed). Hangar's « too many » is waited out and tried again after 15 s.
+  ones) and never closer than 7 seconds, and once more when the tab is hidden. Hangar's « too many » is waited out and tried again after 15 s.
 - **The module is committed.** Hangar runs the `.wasm` a kit ships and never builds one, so a
   kit installed by cloning works as it is. It is built with a pinned compiler and no path of
   the machine in it, so that the same source gives the same bytes anywhere.
@@ -136,14 +120,15 @@ Choices worth knowing:
 ## Tests
 
 ```
-node --test kits/checklist/                          # the page, the manifest, the plugin
 cargo test --manifest-path native/Cargo.toml --locked  # the native tab
+node --test kits/checklist/                            # the manifest, the plugin, the skill
+scripts/build-native.sh --check                        # the committed module is native/'s build
 ```
 
-The native tests are the page's, case for case (`native/tests/logic.rs`, `controller.rs`,
-`view.rs`, `manifest.rs`), run on the host through the SDK's `testing::Harness`: a pretend
-Hangar answers the tab's calls over files and a data folder held in memory. They also hold
-what the page and the tab share to the byte: the steps' keys, the answers' file, the summary.
+The native tests run on the host through the SDK's `testing::Harness`: a pretend Hangar answers the
+tab's calls over files and a data folder held in memory. They also hold what the earlier HTML tab
+wrote to the byte: the steps' keys, the answers' file, the summary. The Node test needs no install
+step.
 
 To change the native tab, edit `native/`, then build the module and commit it with the source:
 
@@ -157,12 +142,6 @@ link this folder, open the tab, and reload it from its bar after each build. Wit
 `cargo run -p hangar-kit-host --example preview -- tabs/checklist.wasm`.
 
 ## This repository
-
-`node --test` runs the tests, with Node alone. Hangar's own files are not in this repository. CI takes Hangar UI and the docs from the Hangar tag the
-manifest's `hangar` names, and `node test/hangar-ui.js --get` does the same here. Without them, these tests
-skip what needs those files, and say so:
-
-- the permissions and methods used are in the docs, when the docs are around
 
 CI calls [kit-check](https://github.com/hangar-ai/.github/blob/main/.github/workflows/kit-check.yml),
 then tests the native tab, rebuilds `tabs/checklist.wasm` and fails if the committed module is not
