@@ -2,7 +2,7 @@
   "schema": 2,
   "id": "checklist",
   "name": "Checklist",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A tab where a person works through a list of manual checks an agent wrote, and the agent gets the result back to fix what failed.",
   "author": "Hangar",
   "homepage": "https://github.com/hangar-ai/kit-checklist",
