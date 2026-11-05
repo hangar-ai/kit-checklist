@@ -1,0 +1,6 @@
+# The module is committed, and CI rebuilds it to check it was not left behind:
+# the same compiler gives the same bytes.
+[toolchain]
+channel = "1.99.1"
+targets = ["wasm32-unknown-unknown"]
+profile = "minimal"
